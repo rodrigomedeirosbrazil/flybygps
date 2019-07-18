@@ -1,5 +1,15 @@
 import React, { Fragment, Component } from "react";
-import { SafeAreaView, StyleSheet, View, Text, StatusBar } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  Button,
+  Platform,
+  PermissionsAndroid,
+  Animated
+} from "react-native";
 
 import Svg, {
   Circle,
@@ -9,22 +19,73 @@ import Svg, {
   Line
 } from "react-native-svg";
 
-import Geolocation from "react-native-geolocation-service";
+import Geolocation from "@react-native-community/geolocation";
 
 class App extends Component {
   watchId = null;
 
-  state = {
-    loading: false,
-    updatesEnabled: false,
-    location: {},
-    compass_rotation: 0,
-    needle_rotation: 45
-  };
-
   constructor(props) {
     super(props);
+    this.state = {
+      loading: false,
+      updatesEnabled: false,
+      location: {},
+      compassAnimation: new Animated.Value(0),
+      compassRotation: 0,
+      needleAnimation: new Animated.Value(0),
+      needleRotation: 0
+    };
+
+    this.state.compassAnimation.addListener(p => {
+      this.setCompass(p.value);
+    });
+
+    //this.getLocation();
+    this.getLocationUpdates();
   }
+
+  setCompass = rotation => {
+    const newRotation =
+      rotation < 0 ? Math.trunc(rotation) + 360 : Math.trunc(rotation) % 360;
+    //console.log("rotation", newRotation);
+    this.setState({
+      compassRotation: newRotation
+    });
+  };
+
+  setHeading = position => {
+    this.setState({ location: position });
+
+    let newRotation = position.coords.heading
+      ? 360 - position.coords.heading
+      : 0;
+
+    const calcOldRotation = 360 - this.state.compassRotation;
+    const calcNewRotation = 360 - newRotation;
+    let dif = calcOldRotation - calcNewRotation;
+
+    // escolhe a direção mais curta para girar
+    if (dif >= 0 && dif > 180) {
+      dif = (360 - dif) * -1;
+    } else if (dif < 0 && dif < -180) {
+      dif = dif + 360;
+    }
+    const toValue = this.state.compassRotation + dif;
+
+    // console.log(
+    //   position.coords.heading,
+    //   this.state.compassRotation,
+    //   newRotation,
+    //   dif,
+    //   toValue
+    // );
+    Animated.timing(this.state.compassAnimation).stop();
+    Animated.timing(this.state.compassAnimation, {
+      toValue: toValue,
+      duration: 500,
+      useNativeDriver: true
+    }).start();
+  };
 
   hasLocationPermission = async () => {
     if (
@@ -69,7 +130,11 @@ class App extends Component {
     this.setState({ loading: true }, () => {
       Geolocation.getCurrentPosition(
         position => {
-          this.setState({ location: position, loading: false });
+          this.setState({
+            location: position,
+            compass_rotation: position.coords.heading - 360,
+            loading: false
+          });
           console.log(position);
         },
         error => {
@@ -93,22 +158,12 @@ class App extends Component {
     if (!hasLocationPermission) return;
 
     this.setState({ updatesEnabled: true }, () => {
-      this.watchId = Geolocation.watchPosition(
-        position => {
-          this.setState({ location: position });
-          console.log(position);
-        },
-        error => {
-          this.setState({ location: error });
-          console.log(error);
-        },
-        {
-          enableHighAccuracy: true,
-          distanceFilter: 0,
-          interval: 5000,
-          fastestInterval: 2000
-        }
-      );
+      this.watchId = Geolocation.watchPosition(position => {
+        this.setState({
+          location: position
+        });
+        this.setHeading(position);
+      });
     });
   };
 
@@ -126,12 +181,9 @@ class App extends Component {
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={styles.container}>
           <View>
-            <View style={styles.result}>
-              <Text>{JSON.stringify(location, null, 4)}</Text>
-            </View>
             <Svg height="50%" width="50%" viewBox="0 0 100 100">
               <G
-                rotation={this.state.compass_rotation}
+                rotation={this.state.compassRotation}
                 origin="50, 50"
                 id="compass"
               >
@@ -165,7 +217,7 @@ class App extends Component {
                 </TextSVG>
               </G>
               <G
-                rotation={this.state.needle_rotation}
+                rotation={this.state.needleRotation}
                 origin="50, 50"
                 id="needle"
               >
@@ -177,6 +229,30 @@ class App extends Component {
                 />
               </G>
             </Svg>
+          </View>
+          <View style={styles.container}>
+            <Button title="Roda a roda" onPress={this.roda} />
+            <Button
+              title="Get Location"
+              onPress={this.getLocation}
+              disabled={loading || updatesEnabled}
+            />
+            <View style={styles.buttons}>
+              <Button
+                title="Start Observing"
+                onPress={this.getLocationUpdates}
+                disabled={updatesEnabled}
+              />
+              <Button
+                title="Stop Observing"
+                onPress={this.removeLocationUpdates}
+                disabled={!updatesEnabled}
+              />
+            </View>
+
+            <View style={styles.result}>
+              <Text>{JSON.stringify(location, null, 4)}</Text>
+            </View>
           </View>
         </SafeAreaView>
       </Fragment>

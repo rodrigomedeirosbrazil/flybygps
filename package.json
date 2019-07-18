@@ -7,10 +7,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^1.4.2",
     "babel-plugin-root-import": "^6.3.0",
     "react": "16.8.6",
     "react-native": "0.60.3",
-    "react-native-geolocation-service": "^2.0.1",
     "react-native-svg": "^9.5.3"
   },
   "devDependencies": {
