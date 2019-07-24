@@ -52,14 +52,6 @@ class Compass extends Component {
       this.state.compassRotation +
       this.calcNearTurn(this.state.compassRotation, newRotation);
 
-    console.log(
-      newHeading,
-      newRotation,
-      this.state.compassRotation,
-      this.calcNearTurn(this.state.compassRotation, newRotation),
-      toValue
-    );
-
     if (this.compassAnimation) Animated.timing(this.compassAnimation).stop();
     (this.compassAnimation = new Animated.Value(this.state.compassRotation)),
       this.compassAnimation.addListener(param => {
@@ -89,7 +81,6 @@ class Compass extends Component {
   };
 
   render() {
-    const { loading, location, updatesEnabled } = this.state;
     return (
       <View>
         <Svg

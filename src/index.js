@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import Compass from "./components/Compass";
+import Speed from "./components/Speed";
 
 import Geolocation from "@react-native-community/geolocation";
 
@@ -43,8 +44,8 @@ class App extends Component {
       location: {}
     };
 
-    // this.getLocation();
-    // this.getLocationUpdates();
+    this.getLocation();
+    this.getLocationUpdates();
   }
 
   hasLocationPermission = async () => {
@@ -90,7 +91,7 @@ class App extends Component {
     this.setState({ loading: true }, () => {
       Geolocation.getCurrentPosition(
         position => {
-          this.compass.setPosition(position);
+          this.newPosition(position);
         },
         error => {
           this.setState({ location: error, loading: false });
@@ -109,8 +110,7 @@ class App extends Component {
     this.setState({ updatesEnabled: true }, () => {
       this.watchId = Geolocation.watchPosition(
         position => {
-          this.setState({ location: position });
-          this.compass.setPosition(position);
+          this.newPosition(position);
         },
         error => {
           this.setState({ location: error, loading: false });
@@ -128,34 +128,26 @@ class App extends Component {
     }
   };
 
+  newPosition = position => {
+    if (!position) return;
+    this.setState({ location: position });
+    this.compass.setPosition(position);
+    this.speed.setPosition(position);
+  };
+
   render() {
     const { loading, location, updatesEnabled } = this.state;
     return (
       <Fragment>
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={styles.container}>
-          <Compass onRef={ref => (this.compass = ref)} />
+          <View style={styles.row}>
+            <Compass onRef={ref => (this.compass = ref)} />
+            <View style={styles.col}>
+              <Speed onRef={ref => (this.speed = ref)} />
+            </View>
+          </View>
           <View style={styles.container}>
-            <Button
-              title="300 graus"
-              onPress={() => {
-                this.compass.setPosition({
-                  coords: {
-                    heading: 300
-                  }
-                });
-              }}
-            />
-            <Button
-              title="15 graus"
-              onPress={() => {
-                this.compass.setPosition({
-                  coords: {
-                    heading: 15
-                  }
-                });
-              }}
-            />
             <Button
               title="Get Location"
               onPress={this.getLocation}
@@ -188,6 +180,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#D8EBCD"
+  },
+  row: {
+    flex: 1,
+    flexDirection: "row"
+  },
+  col: {
+    flex: 1
   }
 });
 
