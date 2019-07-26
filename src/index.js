@@ -3,172 +3,57 @@ import {
   SafeAreaView,
   StyleSheet,
   View,
-  Text,
   StatusBar,
-  Button,
-  Platform,
-  PermissionsAndroid
+  Text,
+  Button
 } from "react-native";
 
-import Compass from "./components/Compass";
-import Speed from "./components/Speed";
+import { connect } from "react-redux";
+import { toggleGpsAction, newPositionAction } from "./store/actions/gps";
 
-import Geolocation from "@react-native-community/geolocation";
+import GpsService from "./services/gps"
+import Compass from "./components/Compass";
+// import Speed from "./components/Speed";
 
 class App extends Component {
-  watchId = null;
-
-  getLocationOptions = {
-    enableHighAccuracy: true,
-    timeout: 15000,
-    maximumAge: 10000,
-    distanceFilter: 1,
-    forceRequestLocation: true,
-    showLocationDialog: true
-  };
-
-  watchPositionOptions = {
-    enableHighAccuracy: true,
-    distanceFilter: 1,
-    interval: 1000,
-    fastInterval: 900,
-    showLocationDialog: true,
-    forceRequestLocation: true
-  };
-
   constructor(props) {
     super(props);
-    this.state = {
-      loading: false,
-      updatesEnabled: false,
-      location: {}
-    };
-
-    this.getLocation();
-    this.getLocationUpdates();
   }
 
-  hasLocationPermission = async () => {
-    if (
-      Platform.OS === "ios" ||
-      (Platform.OS === "android" && Platform.Version < 23)
-    ) {
-      return true;
-    }
+  componentDidMount() {
+    // this.props.toggleGps(true);
+  }
 
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-    );
-
-    if (hasPermission) return true;
-
-    const status = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-    );
-
-    if (status === PermissionsAndroid.RESULTS.GRANTED) return true;
-
-    if (status === PermissionsAndroid.RESULTS.DENIED) {
-      ToastAndroid.show(
-        "Location permission denied by user.",
-        ToastAndroid.LONG
-      );
-    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-      ToastAndroid.show(
-        "Location permission revoked by user.",
-        ToastAndroid.LONG
-      );
-    }
-
-    return false;
-  };
-
-  getLocation = async () => {
-    const hasLocationPermission = await this.hasLocationPermission();
-
-    if (!hasLocationPermission) return;
-
-    this.setState({ loading: true }, () => {
-      Geolocation.getCurrentPosition(
-        position => {
-          this.newPosition(position);
-        },
-        error => {
-          this.setState({ location: error, loading: false });
-          console.log(error);
-        },
-        this.getLocationOptions
-      );
-    });
-  };
-
-  getLocationUpdates = async () => {
-    const hasLocationPermission = await this.hasLocationPermission();
-
-    if (!hasLocationPermission) return;
-
-    this.setState({ updatesEnabled: true }, () => {
-      this.watchId = Geolocation.watchPosition(
-        position => {
-          this.newPosition(position);
-        },
-        error => {
-          this.setState({ location: error, loading: false });
-          console.log(error);
-        },
-        this.watchPositionOptions
-      );
-    });
-  };
-
-  removeLocationUpdates = () => {
-    if (this.watchId !== null) {
-      Geolocation.clearWatch(this.watchId);
-      this.setState({ updatesEnabled: false });
-    }
-  };
-
-  newPosition = position => {
-    if (!position) return;
-    this.setState({ location: position });
-    this.compass.setPosition(position);
-    this.speed.setPosition(position);
-  };
+  doSomething = () => {
+    // this.props.newPosition({
+    //   coords: {
+    //     heading: 200
+    //   }
+    // });
+    this.props.toggleGps(this.props.isOn ? false : true);
+  }
 
   render() {
-    const { loading, location, updatesEnabled } = this.state;
     return (
       <Fragment>
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={styles.container}>
+          <GpsService />
           <View style={styles.row}>
-            <Compass onRef={ref => (this.compass = ref)} />
-            <View style={styles.col}>
-              <Speed onRef={ref => (this.speed = ref)} />
-            </View>
+            <Compass />
+            {/* <View style={styles.col}>
+              <Speed />
+            </View> */}
           </View>
-          <View style={styles.container}>
+          <View>
+            <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
+            <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
+          </View>
+          <View>
             <Button
-              title="Get Location"
-              onPress={this.getLocation}
-              disabled={loading || updatesEnabled}
+              title="Do something"
+              onPress={ this.doSomething }
             />
-            <View style={styles.buttons}>
-              <Button
-                title="Start Observing"
-                onPress={this.getLocationUpdates}
-                disabled={updatesEnabled}
-              />
-              <Button
-                title="Stop Observing"
-                onPress={this.removeLocationUpdates}
-                disabled={!updatesEnabled}
-              />
-            </View>
-
-            <View style={styles.result}>
-              <Text>{JSON.stringify(location, null, 4)}</Text>
-            </View>
           </View>
         </SafeAreaView>
       </Fragment>
@@ -190,4 +75,25 @@ const styles = StyleSheet.create({
   }
 });
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    position: state.gps.position,
+    isOn: state.gps.isOn
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    toggleGps: isOn => {
+      dispatch(toggleGpsAction(isOn));
+    },
+    newPosition: position => {
+      dispatch(newPositionAction(position));
+    }
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

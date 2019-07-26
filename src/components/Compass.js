@@ -2,10 +2,12 @@ import React, { Component } from "react";
 import { View, Animated } from "react-native";
 
 import Svg, { Circle, Text as TextSVG, G, Polygon } from "react-native-svg";
+import { connect } from "react-redux";
 
 class Compass extends Component {
   compassAnimation = null;
   needleAnimation = null;
+  lastPosition = null;
 
   constructor(props) {
     super(props);
@@ -16,11 +18,11 @@ class Compass extends Component {
     };
   }
 
-  componentDidMount() {
-    this.props.onRef(this);
-  }
-  componentWillUnmount() {
-    this.props.onRef(undefined);
+  componentDidUpdate() {
+    if (this.lastPosition !== this.props.position){
+      this.lastPosition = this.props.position;
+      this.setPosition(this.props.position);
+    }
   }
 
   setCompass = rotation => {
@@ -132,4 +134,13 @@ class Compass extends Component {
     );
   }
 }
-export default Compass;
+
+const mapStateToProps = state => {
+  return {
+    position: state.gps.position,
+  };
+};
+
+export default connect(
+  mapStateToProps, null
+)(Compass);
