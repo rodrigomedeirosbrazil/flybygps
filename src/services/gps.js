@@ -31,18 +31,21 @@ class Gps extends Component {
   constructor(props) {
     super(props);
     if (this.props.isOn) {
-      this.getLocation();
+      //this.getLocation();
       this.getLocationUpdates();
     }
   }
 
-  componentDidUpdate() {
-    console.log('component did update GPS')
+  componentDidUpdate(param1, param2) {
+    console.tron.log("GPS", param1, param2);
+
     if (this.props.isOn && !this.updatesEnabled) {
+      console.tron.log('GPS ON')
       this.updatesEnabled = true;
-      this.getLocation();
+      //this.getLocation();
       this.getLocationUpdates();
-    } else if (this.props.isOn && this.updatesEnabled) {
+    } else if (!this.props.isOn && this.updatesEnabled) {
+      console.tron.log("GPS OFF");
       this.updatesEnabled = false;    
       this.removeLocationUpdates();
     }
@@ -91,6 +94,8 @@ class Gps extends Component {
     this.setState({ loading: true }, () => {
       Geolocation.getCurrentPosition(
         position => {
+          console.tron.log("GPS getLocation", position);
+
           this.props.newPosition(position);
         },
         error => {
@@ -110,6 +115,7 @@ class Gps extends Component {
     this.setState({ updatesEnabled: true }, () => {
       this.watchId = Geolocation.watchPosition(
         position => {
+          console.tron.log("GPS getLocationUpdates", position);
           this.props.newPosition(position);
         },
         error => {
