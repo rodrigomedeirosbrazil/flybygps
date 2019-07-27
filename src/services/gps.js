@@ -13,7 +13,7 @@ class Gps extends Component {
   getLocationOptions = {
     enableHighAccuracy: true,
     timeout: 15000,
-    maximumAge: 10000,
+    maximumAge: 60*60*24,
     distanceFilter: 1,
     forceRequestLocation: true,
     showLocationDialog: true
@@ -30,22 +30,15 @@ class Gps extends Component {
 
   constructor(props) {
     super(props);
-    if (this.props.isOn) {
-      //this.getLocation();
-      this.getLocationUpdates();
-    }
+    this.getLocation();    
   }
 
-  componentDidUpdate(param1, param2) {
-    console.tron.log("GPS", param1, param2);
-
+  componentDidUpdate() {
     if (this.props.isOn && !this.updatesEnabled) {
-      console.tron.log('GPS ON')
       this.updatesEnabled = true;
-      //this.getLocation();
+      this.getLocation();
       this.getLocationUpdates();
     } else if (!this.props.isOn && this.updatesEnabled) {
-      console.tron.log("GPS OFF");
       this.updatesEnabled = false;    
       this.removeLocationUpdates();
     }
@@ -91,46 +84,36 @@ class Gps extends Component {
 
     if (!hasLocationPermission) return;
 
-    this.setState({ loading: true }, () => {
-      Geolocation.getCurrentPosition(
-        position => {
-          console.tron.log("GPS getLocation", position);
-
-          this.props.newPosition(position);
-        },
-        error => {
-          this.setState({ location: error, loading: false });
-          console.log(error);
-        },
-        this.getLocationOptions
-      );
-    });
+     Geolocation.getCurrentPosition(
+       position => {
+         this.props.newPosition(position);
+       },
+       error => {
+         this.setState({ location: error, loading: false });
+        //  console.log(error);
+       },
+       this.getLocationOptions
+     );
   };
 
   getLocationUpdates = async () => {
     const hasLocationPermission = await this.hasLocationPermission();
-
     if (!hasLocationPermission) return;
 
-    this.setState({ updatesEnabled: true }, () => {
-      this.watchId = Geolocation.watchPosition(
-        position => {
-          console.tron.log("GPS getLocationUpdates", position);
-          this.props.newPosition(position);
-        },
-        error => {
-          this.setState({ location: error, loading: false });
-          console.log(error);
-        },
-        this.watchPositionOptions
-      );
-    });
+    this.watchId = Geolocation.watchPosition(
+      position => {
+        this.props.newPosition(position);
+      },
+      error => {
+        this.setState({ location: error, loading: false });
+      },
+      this.watchPositionOptions
+    );
   };
 
   removeLocationUpdates = () => {
     if (this.watchId !== null) {
       Geolocation.clearWatch(this.watchId);
-      this.setState({ updatesEnabled: false });
     }
   };
 

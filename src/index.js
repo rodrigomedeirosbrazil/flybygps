@@ -13,7 +13,9 @@ import { toggleGpsAction, newPositionAction } from "./store/actions/gps";
 
 import GpsService from "./services/gps"
 import Compass from "./components/Compass";
-// import Speed from "./components/Speed";
+import Speed from "./components/Speed";
+import Altitude from "./components/Altitude";
+
 
 class App extends Component {
   constructor(props) {
@@ -21,16 +23,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // this.props.toggleGps(true);
-  }
-
-  doSomething = () => {
-    // this.props.newPosition({
-    //   coords: {
-    //     heading: 200
-    //   }
-    // });
-    this.props.toggleGps(this.props.isOn ? false : true);
+    this.props.toggleGps(true);
   }
 
   render() {
@@ -39,21 +32,12 @@ class App extends Component {
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={styles.container}>
           <GpsService />
-          <View style={styles.row}>
+          <View style={styles.col}>
             <Compass />
-            {/* <View style={styles.col}>
               <Speed />
-            </View> */}
-          </View>
-          <View>
-            <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
-            <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
-          </View>
-          <View>
-            <Button
-              title="Do something"
-              onPress={ this.doSomething }
-            />
+              <Altitude />
+              <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
+              <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
           </View>
         </SafeAreaView>
       </Fragment>

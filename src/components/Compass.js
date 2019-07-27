@@ -20,8 +20,6 @@ class Compass extends Component {
 
   componentDidUpdate() {
     if (this.lastPosition !== this.props.position) {
-      console.tron.log("did update do compass", this.props);
-
       this.lastPosition = this.props.position;
       this.setPosition(this.props.position);
     }
@@ -30,7 +28,6 @@ class Compass extends Component {
   setCompass = rotation => {
     const newRotation =
       rotation < 0 ? Math.trunc(rotation) + 360 : Math.trunc(rotation) % 360;
-    console.log(rotation, newRotation);
     this.setState({
       compassRotation: newRotation
     });

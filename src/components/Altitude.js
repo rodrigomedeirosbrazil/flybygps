@@ -4,13 +4,13 @@ import Config from "../config";
 import { connect } from "react-redux";
 
 
-class Speed extends Component {
+class Altitude extends Component {
   lastPosition = null;
 
   constructor(props) {
     super(props);
     this.state = {
-      speed: 0
+      altitude: 0
     };
   }
 
@@ -25,16 +25,16 @@ class Speed extends Component {
     if (
       !position ||
       !position.coords ||
-      !position.coords.speed ||
-      position.coords.speed == this.speed
+      !position.coords.altitude ||
+      position.coords.altitude == this.altitude
     )
       return;
 
-    this.setSpeed(position.coords.speed);
+    this.setAltitude(position.coords.altitude);
   };
 
-  setSpeed = speed => {
-    this.state.speed = speed.toFixed(speed < 10 ? 1 : 0);
+  setAltitude = altitude => {
+    this.state.altitude = altitude.toFixed(altitude < 10 ? 1 : 0);
   };
 
   render() {
@@ -48,7 +48,7 @@ class Speed extends Component {
             alignItems: "center"
           }}
         >
-          <Text style={styles.speedText}>SPEED</Text>
+          <Text style={styles.text}>ALTITUDE</Text>
         </View>
         <View
           style={{
@@ -58,7 +58,7 @@ class Speed extends Component {
             alignItems: "center"
           }}
         >
-          <Text style={styles.speedNumber}>{this.state.speed}</Text>
+          <Text style={styles.number}>{this.state.altitude}</Text>
         </View>
         <View
           style={{
@@ -68,7 +68,7 @@ class Speed extends Component {
             alignItems: "center"
           }}
         >
-          <Text style={styles.speedText}>KM/H</Text>
+          <Text style={styles.text}>m</Text>
         </View>
       </View>
     );
@@ -83,11 +83,11 @@ const styles = StyleSheet.create({
     // alignItems: "center",
     // justifyContent: "center"
   },
-  speedNumber: {
+  number: {
     fontSize: 50,
     fontWeight: "bold"
   },
-  speedText: {
+  text: {
     fontSize: 12,
     alignItems: "flex-start"
   }
@@ -101,4 +101,4 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps, null
-)(Speed);
+)(Altitude);
