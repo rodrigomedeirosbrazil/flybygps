@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import Config from "../config";
 import { connect } from "react-redux";
 
@@ -10,7 +10,9 @@ class Altitude extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      altitude: 0
+      altitude: 0,
+      altitudeUnitSymbol: "",
+      altitudeUnitIndex: 0
     };
   }
 
@@ -34,43 +36,58 @@ class Altitude extends Component {
   };
 
   setAltitude = altitude => {
-    this.state.altitude = altitude.toFixed(altitude < 10 ? 1 : 0);
+    const altitudeUnit = Config.altitudeUnits[this.state.altitudeUnitIndex];
+    const calcAltitude = altitude * altitudeUnit.factor;
+    this.state.altitude = calcAltitude.toFixed(calcAltitude < 10 ? 1 : 0);
+    this.state.altitudeUnitSymbol = altitudeUnit.symbol;
+  };
+
+  changeUnit = () => {
+    const units = Config.altitudeUnits.length - 1;
+    if (this.state.altitudeUnitIndex < units) this
+                                                .state
+                                                .altitudeUnitIndex++;
+    else this.state.altitudeUnitIndex = 0;
   };
 
   render() {
     const {} = this.state;
     return (
-      <View style={styles.container}>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Text style={styles.text}>ALTITUDE</Text>
+      <TouchableHighlight onPress={this.changeUnit}>
+        <View style={styles.container}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center"
+            }}
+          >
+            <Text style={styles.text}>ALTITUDE</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 5
+            }}
+          >
+            <Text style={styles.number}>{this.state.altitude}</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              padding: 5
+            }}
+          >
+            <Text style={styles.text}>{this.state.altitudeUnitSymbol}</Text>
+          </View>
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Text style={styles.number}>{this.state.altitude}</Text>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center"
-          }}
-        >
-          <Text style={styles.text}>m</Text>
-        </View>
-      </View>
+      </TouchableHighlight>
     );
   }
 }

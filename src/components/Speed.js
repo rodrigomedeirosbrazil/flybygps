@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import Config from "../config";
 import { connect } from "react-redux";
 
@@ -10,7 +10,9 @@ class Speed extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      speed: 0
+      speed: null,
+      speedUnitSymbol: "",
+      speedUnitIndex: 1
     };
   }
 
@@ -34,43 +36,60 @@ class Speed extends Component {
   };
 
   setSpeed = speed => {
-    this.state.speed = speed.toFixed(speed < 10 ? 1 : 0);
+    const speedUnit = Config.speedUnits[this.state.speedUnitIndex];
+    const calcSpeed = speed * speedUnit.factor;
+    this.state.speed = calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
+    this.state.speedUnitSymbol = speedUnit.symbol;
   };
+
+  changeUnit = () => {
+    const units = Config.speedUnits.length-1;
+    if (this.state.speedUnitIndex < units) 
+      this.state.speedUnitIndex++;
+    else
+      this.state.speedUnitIndex=0;
+  }
 
   render() {
     const {} = this.state;
     return (
-      <View style={styles.container}>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Text style={styles.speedText}>SPEED</Text>
+      <TouchableHighlight onPress={this.changeUnit}>
+        <View style={styles.container}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 5
+            }}
+          >
+            <Text style={styles.speedText}>SPEED</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Text style={styles.speedNumber}>{this.state.speed}</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              padding: 5
+            }}
+          >
+            <Text style={styles.speedText}>
+              {this.state.speedUnitSymbol}
+            </Text>
+          </View>
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Text style={styles.speedNumber}>{this.state.speed}</Text>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center"
-          }}
-        >
-          <Text style={styles.speedText}>KM/H</Text>
-        </View>
-      </View>
+      </TouchableHighlight>
     );
   }
 }

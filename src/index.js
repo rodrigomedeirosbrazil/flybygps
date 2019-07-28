@@ -5,7 +5,6 @@ import {
   View,
   StatusBar,
   Text,
-  Button
 } from "react-native";
 
 import { connect } from "react-redux";
