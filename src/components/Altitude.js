@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import Config from "../config";
 import { connect } from "react-redux";
 
-
 class Altitude extends Component {
   lastPosition = null;
 
@@ -11,8 +10,9 @@ class Altitude extends Component {
     super(props);
     this.state = {
       altitude: 0,
-      altitudeUnitSymbol: "",
-      altitudeUnitIndex: 0
+      altitudeUnitIndex: 0,
+      altitudeLabel: "",
+      altitudeUnit: ""
     };
   }
 
@@ -29,37 +29,42 @@ class Altitude extends Component {
       !position.coords ||
       !position.coords.altitude ||
       position.coords.altitude == this.altitude
-    )
-      return;
-
-    this.setAltitude(position.coords.altitude);
+    ) {
+      this.setState({ altitude: null });
+    } else {
+      this.setState({ altitude: position.coords.altitude });
+    }
+    this.updateLabels();
   };
 
-  setAltitude = altitude => {
+  updateLabels = () => {
     const altitudeUnit = Config.altitudeUnits[this.state.altitudeUnitIndex];
-    const calcAltitude = altitude * altitudeUnit.factor;
-    this.state.altitude = calcAltitude.toFixed(calcAltitude < 10 ? 1 : 0);
-    this.state.altitudeUnitSymbol = altitudeUnit.symbol;
+    let altitudeLabel = "N/A";
+    if (this.state.altitude) {
+      const calcAltitude = this.state.altitude * altitudeUnit.factor;
+      altitudeLabel = calcAltitude.toFixed(calcAltitude < 10 ? 1 : 0);
+    }
+    this.setState({ altitudeLabel, altitudeUnit: altitudeUnit.symbol });
   };
 
   changeUnit = () => {
     const units = Config.altitudeUnits.length - 1;
-    if (this.state.altitudeUnitIndex < units) this
-                                                .state
-                                                .altitudeUnitIndex++;
+    if (this.state.altitudeUnitIndex < units) this.state.altitudeUnitIndex++;
     else this.state.altitudeUnitIndex = 0;
+    this.updateLabels();
   };
 
   render() {
     const {} = this.state;
     return (
-      <TouchableHighlight onPress={this.changeUnit}>
+      <TouchableHighlight onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
           <View
             style={{
               flex: 1,
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              padding: 5
             }}
           >
             <Text style={styles.text}>ALTITUDE</Text>
@@ -73,7 +78,7 @@ class Altitude extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.number}>{this.state.altitude}</Text>
+            <Text style={styles.number}>{this.state.altitudeLabel}</Text>
           </View>
           <View
             style={{
@@ -84,7 +89,7 @@ class Altitude extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>{this.state.altitudeUnitSymbol}</Text>
+            <Text style={styles.text}>{this.state.altitudeUnit}</Text>
           </View>
         </View>
       </TouchableHighlight>
@@ -93,12 +98,15 @@ class Altitude extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#FFF",
-    width: 150,
+  button: {
+    width: "50%",
     height: 100,
-    // alignItems: "center",
-    // justifyContent: "center"
+    borderColor: "#222",
+    borderWidth: 1
+  },
+  container: {
+    width: "100%",
+    height: "100%"
   },
   number: {
     fontSize: 50,
@@ -112,10 +120,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    position: state.gps.position,
+    position: state.gps.position
   };
 };
 
 export default connect(
-  mapStateToProps, null
+  mapStateToProps,
+  null
 )(Altitude);

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import Config from "../config";
 import { connect } from "react-redux";
 
-
 class Speed extends Component {
   lastPosition = null;
 
@@ -11,8 +10,9 @@ class Speed extends Component {
     super(props);
     this.state = {
       speed: null,
-      speedUnitSymbol: "",
-      speedUnitIndex: 1
+      speedUnitIndex: 1,
+      speedLabel: "",
+      speedUnit: ""
     };
   }
 
@@ -29,31 +29,35 @@ class Speed extends Component {
       !position.coords ||
       !position.coords.speed ||
       position.coords.speed == this.speed
-    )
-      return;
-
-    this.setSpeed(position.coords.speed);
+    ) {
+      this.setState({ speed: null });
+    } else {
+      this.setState({ speed: position.coords.speed });
+    }
+    this.updateLabels();
   };
 
-  setSpeed = speed => {
+  updateLabels = () => {
     const speedUnit = Config.speedUnits[this.state.speedUnitIndex];
-    const calcSpeed = speed * speedUnit.factor;
-    this.state.speed = calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
-    this.state.speedUnitSymbol = speedUnit.symbol;
+    let speedLabel = "N/A";
+    if (this.state.speed) {
+      const calcSpeed = this.state.speed * speedUnit.factor;
+      speedLabel = calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
+    }
+    this.setState({ speedLabel, speedUnit: speedUnit.symbol });
   };
 
   changeUnit = () => {
-    const units = Config.speedUnits.length-1;
-    if (this.state.speedUnitIndex < units) 
-      this.state.speedUnitIndex++;
-    else
-      this.state.speedUnitIndex=0;
-  }
+    const units = Config.speedUnits.length - 1;
+    if (this.state.speedUnitIndex < units) this.state.speedUnitIndex++;
+    else this.state.speedUnitIndex = 0;
+    this.updateLabels();
+  };
 
   render() {
     const {} = this.state;
     return (
-      <TouchableHighlight onPress={this.changeUnit}>
+      <TouchableHighlight onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
           <View
             style={{
@@ -63,7 +67,7 @@ class Speed extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.speedText}>SPEED</Text>
+            <Text style={styles.text}>SPEED</Text>
           </View>
           <View
             style={{
@@ -73,7 +77,7 @@ class Speed extends Component {
               alignItems: "center"
             }}
           >
-            <Text style={styles.speedNumber}>{this.state.speed}</Text>
+            <Text style={styles.number}>{this.state.speedLabel}</Text>
           </View>
           <View
             style={{
@@ -84,9 +88,7 @@ class Speed extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.speedText}>
-              {this.state.speedUnitSymbol}
-            </Text>
+            <Text style={styles.text}>{this.state.speedUnit}</Text>
           </View>
         </View>
       </TouchableHighlight>
@@ -95,18 +97,21 @@ class Speed extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#FFF",
-    width: 150,
+  button: {
+    width: "50%",
     height: 100,
-    // alignItems: "center",
-    // justifyContent: "center"
+    borderColor: "#222",
+    borderWidth: 1
   },
-  speedNumber: {
+  container: {
+    width: "100%",
+    height: "100%"
+  },
+  number: {
     fontSize: 50,
     fontWeight: "bold"
   },
-  speedText: {
+  text: {
     fontSize: 12,
     alignItems: "flex-start"
   }
@@ -114,10 +119,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    position: state.gps.position,
+    position: state.gps.position
   };
 };
 
 export default connect(
-  mapStateToProps, null
+  mapStateToProps,
+  null
 )(Speed);

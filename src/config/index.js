@@ -19,7 +19,7 @@ const config = {
     },
     {
       name: "kilometer an hour",
-      symbol: "km/s",
+      symbol: "km/h",
       factor: 3.6
     },
     {

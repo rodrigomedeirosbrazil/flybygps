@@ -1,20 +1,13 @@
 import React, { Fragment, Component } from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  StatusBar,
-  Text,
-} from "react-native";
+import { SafeAreaView, StyleSheet, View, StatusBar, Text } from "react-native";
 
 import { connect } from "react-redux";
 import { toggleGpsAction, newPositionAction } from "./store/actions/gps";
 
-import GpsService from "./services/gps"
+import GpsService from "./services/gps";
 import Compass from "./components/Compass";
 import Speed from "./components/Speed";
 import Altitude from "./components/Altitude";
-
 
 class App extends Component {
   constructor(props) {
@@ -32,11 +25,15 @@ class App extends Component {
         <SafeAreaView style={styles.container}>
           <GpsService />
           <View style={styles.col}>
-            <Compass />
+            <View style={styles.row}>
               <Speed />
               <Altitude />
-              <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
-              <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
+            </View>
+            <View style={{ alignItems: "center", padding: 10 }}>
+              <Compass />
+            </View>
+            <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
+            <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
           </View>
         </SafeAreaView>
       </Fragment>
@@ -50,7 +47,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#D8EBCD"
   },
   row: {
-    flex: 1,
     flexDirection: "row"
   },
   col: {

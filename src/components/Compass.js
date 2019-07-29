@@ -84,12 +84,7 @@ class Compass extends Component {
   render() {
     return (
       <View>
-        <Svg
-          height="200"
-          width="200"
-          viewBox="0 0 100 100"
-          style={{ borderColor: "#fa0", borderWidth: 5 }}
-        >
+        <Svg height="200" width="200" viewBox="0 0 100 100">
           <G rotation={this.state.compassRotation} origin="50, 50" id="compass">
             <Circle
               cx="50"
@@ -136,10 +131,11 @@ class Compass extends Component {
 
 const mapStateToProps = state => {
   return {
-    position: state.gps.position,
+    position: state.gps.position
   };
 };
 
 export default connect(
-  mapStateToProps, null
+  mapStateToProps,
+  null
 )(Compass);
