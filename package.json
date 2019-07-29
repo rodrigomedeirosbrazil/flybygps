@@ -9,6 +9,7 @@
   "dependencies": {
     "@react-native-community/geolocation": "^1.4.2",
     "babel-plugin-root-import": "^6.3.0",
+    "geolib": "^3.0.4",
     "react": "16.8.6",
     "react-native": "0.60.3",
     "react-native-svg": "^9.5.3",

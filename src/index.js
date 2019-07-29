@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet, View, StatusBar, Text } from "react-native";
 
 import { connect } from "react-redux";
 import { toggleGpsAction, newPositionAction } from "./store/actions/gps";
+import { getDistance, getRhumbLineBearing } from "geolib";
 
 import GpsService from "./services/gps";
 import Compass from "./components/Compass";
@@ -17,6 +18,32 @@ class App extends Component {
   componentDidMount() {
     this.props.toggleGps(true);
   }
+
+  getDistanceTo = () => {
+    if (this.props.position && this.props.position.coords) {
+      return getDistance(
+        {
+          latitude: this.props.position.coords.latitude,
+          longitude: this.props.position.coords.longitude
+        },
+        { latitude: -23.556819, longitude: -46.665771 }
+      );
+    }
+    return "N/A";
+  };
+
+  getBearingTo = () => {
+    if (this.props.position && this.props.position.coords) {
+      return getRhumbLineBearing(
+        {
+          latitude: this.props.position.coords.latitude,
+          longitude: this.props.position.coords.longitude
+        },
+        { latitude: -23.556819, longitude: -46.665771 }
+      );
+    }
+    return "N/A";
+  };
 
   render() {
     return (
@@ -34,6 +61,8 @@ class App extends Component {
             </View>
             <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
             <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
+            <Text>Distance: {this.getDistanceTo()}</Text>
+            <Text>Bearing: {this.getBearingTo()}</Text>
           </View>
         </SafeAreaView>
       </Fragment>
