@@ -39,12 +39,15 @@ class Waypoints extends Component {
             <FlatList
               data={this.props.waypoints}
               keyExtractor={(item, index) => index}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
                 <TouchableHighlight
                   style={styles.item}
                   onPress={() => {
                     this.props.setWaypoint(item);
                     navigate("Home");
+                  }}
+                  onLongPress={() => {
+                    navigate("Waypoint", { index });
                   }}
                 >
                   <Text style={styles.itemName}>{item.name}</Text>
