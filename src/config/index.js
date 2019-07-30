@@ -1,4 +1,16 @@
 const config = {
+  distanceUnits: [
+    {
+      name: "kilometers",
+      symbol: "km",
+      factor: 0.001
+    },
+    {
+      name: "miles",
+      symbol: "mi",
+      factor: 0.000621371
+    }
+  ],
   altitudeUnits: [
     {
       name: "meters",

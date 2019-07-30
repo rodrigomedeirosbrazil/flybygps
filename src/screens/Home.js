@@ -16,6 +16,7 @@ import GpsService from "../services/gps";
 import Compass from "../components/Compass";
 import Speed from "../components/Speed";
 import Altitude from "../components/Altitude";
+import Distance from "../components/Distance";
 
 class Home extends Component {
   static navigationOptions = {
@@ -86,6 +87,9 @@ class Home extends Component {
               <TouchableHighlight onLongPress={() => navigate("Waypoints")}>
                 <Compass />
               </TouchableHighlight>
+            </View>
+            <View>
+              <Distance />
             </View>
             <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
             <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
