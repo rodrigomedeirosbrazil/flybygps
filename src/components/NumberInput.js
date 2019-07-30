@@ -16,9 +16,19 @@ class NumberInput extends Component {
     }
   };
 
+  componentDidMount() {
+    if (this.props.onRef) this.props.onRef(this.textRef);
+  }
+  componentWillUnmount() {
+    if (this.props.onRef) this.props.onRef(undefined);
+  }
+
   render() {
     return (
       <TextInput
+        ref={textRef => {
+          this.textRef = textRef;
+        }}
         keyboardType="numeric"
         value={this.state.numericString}
         style={this.props.style}
