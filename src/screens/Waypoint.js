@@ -29,6 +29,7 @@ class Waypoint extends Component {
   }
 
   save = () => {
+    const index = this.props.navigation.state.params.index;
     const newWaypoint = {
       name: this.state.name,
       lat: this.state.lat,
@@ -36,21 +37,25 @@ class Waypoint extends Component {
       alt: this.state.alt
     };
     let waypoints = Object.assign(this.props.waypoints);
-    waypoints[this.props.navigation.state.params.index] = newWaypoint;
+    if (index >= 0) waypoints[index] = newWaypoint;
+    else waypoints.push(newWaypoint);
     this.props.updateWaypoints(waypoints);
     this.props.navigation.navigate("Waypoints");
   };
 
   componentDidMount = () => {
-    this.setState({
-      name: this.props.waypoints[this.props.navigation.state.params.index].name,
-      lat: this.props.waypoints[this.props.navigation.state.params.index].lat,
-      lon: this.props.waypoints[this.props.navigation.state.params.index].lon,
-      alt: this.props.waypoints[this.props.navigation.state.params.index].alt
-    });
+    const index = this.props.navigation.state.params.index;
+    if (index >= 0)
+      this.setState({
+        name: this.props.waypoints[index].name,
+        lat: this.props.waypoints[index].lat,
+        lon: this.props.waypoints[index].lon,
+        alt: this.props.waypoints[index].alt
+      });
   };
 
   render() {
+    const index = this.props.navigation.state.params.index;
     return (
       <Fragment>
         <StatusBar barStyle="light-content" />
@@ -58,10 +63,7 @@ class Waypoint extends Component {
           <View>
             <Text style={styles.textLabel}>Name:</Text>
             <TextInput
-              value={
-                this.props.waypoints[this.props.navigation.state.params.index]
-                  .name
-              }
+              value={this.state.name}
               style={styles.input}
               onChangeText={name => {
                 this.setState({ name });
@@ -71,10 +73,7 @@ class Waypoint extends Component {
           <View>
             <Text style={styles.textLabel}>Latitude:</Text>
             <NumberInput
-              value={
-                this.props.waypoints[this.props.navigation.state.params.index]
-                  .lat
-              }
+              value={index >= 0 ? this.props.waypoints[index].lat : ""}
               style={styles.input}
               onChange={lat => {
                 this.setState({ lat });
@@ -84,10 +83,7 @@ class Waypoint extends Component {
           <View>
             <Text style={styles.textLabel}>Longitude:</Text>
             <NumberInput
-              value={
-                this.props.waypoints[this.props.navigation.state.params.index]
-                  .lon
-              }
+              value={index >= 0 ? this.props.waypoints[index].lon : ""}
               style={styles.input}
               onChange={lon => {
                 this.setState({ lon });
@@ -97,10 +93,7 @@ class Waypoint extends Component {
           <View>
             <Text style={styles.textLabel}>Altitude:</Text>
             <NumberInput
-              value={
-                this.props.waypoints[this.props.navigation.state.params.index]
-                  .alt
-              }
+              value={index >= 0 ? this.props.waypoints[index].alt : ""}
               style={styles.input}
               onChange={alt => {
                 this.setState({ alt });

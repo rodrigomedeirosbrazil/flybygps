@@ -31,7 +31,11 @@ class Waypoints extends Component {
         <StatusBar barStyle="light-content" />
         <SafeAreaView>
           <View>
-            <TouchableHighlight>
+            <TouchableHighlight
+              onPress={() => {
+                navigate("Waypoint", { index: -1 });
+              }}
+            >
               <Text style={[styles.itemName, { backgroundColor: "#0AF" }]}>
                 Add new waypoint
               </Text>
