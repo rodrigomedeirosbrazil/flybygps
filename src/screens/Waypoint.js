@@ -1,12 +1,15 @@
 import React, { Fragment, Component } from "react";
 import {
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   View,
   StatusBar,
   Text,
   TextInput,
-  Button
+  Button,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 
 import { connect } from "react-redux";
@@ -60,47 +63,56 @@ class Waypoint extends Component {
       <Fragment>
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={styles.container}>
-          <View>
-            <Text style={styles.textLabel}>Name:</Text>
-            <TextInput
-              value={this.state.name}
-              style={styles.input}
-              onChangeText={name => {
-                this.setState({ name });
-              }}
-            />
-          </View>
-          <View>
-            <Text style={styles.textLabel}>Latitude:</Text>
-            <NumberInput
-              value={index >= 0 ? this.props.waypoints[index].lat : ""}
-              style={styles.input}
-              onChange={lat => {
-                this.setState({ lat });
-              }}
-            />
-          </View>
-          <View>
-            <Text style={styles.textLabel}>Longitude:</Text>
-            <NumberInput
-              value={index >= 0 ? this.props.waypoints[index].lon : ""}
-              style={styles.input}
-              onChange={lon => {
-                this.setState({ lon });
-              }}
-            />
-          </View>
-          <View>
-            <Text style={styles.textLabel}>Altitude:</Text>
-            <NumberInput
-              value={index >= 0 ? this.props.waypoints[index].alt : ""}
-              style={styles.input}
-              onChange={alt => {
-                this.setState({ alt });
-              }}
-            />
-          </View>
-          <Button onPress={this.save} title="Save" />
+          <ScrollView>
+            <KeyboardAvoidingView
+              behavior={Platform.select({
+                ios: "padding",
+                android: "padding"
+              })}
+            >
+              <View>
+                <Text style={styles.textLabel}>Name:</Text>
+                <TextInput
+                  value={this.state.name}
+                  style={styles.input}
+                  onChangeText={name => {
+                    this.setState({ name });
+                  }}
+                />
+              </View>
+              <View>
+                <Text style={styles.textLabel}>Latitude:</Text>
+                <NumberInput
+                  value={index >= 0 ? this.props.waypoints[index].lat : ""}
+                  style={styles.input}
+                  onChange={lat => {
+                    this.setState({ lat });
+                  }}
+                />
+              </View>
+              <View>
+                <Text style={styles.textLabel}>Longitude:</Text>
+                <NumberInput
+                  value={index >= 0 ? this.props.waypoints[index].lon : ""}
+                  style={styles.input}
+                  onChange={lon => {
+                    this.setState({ lon });
+                  }}
+                />
+              </View>
+              <View>
+                <Text style={styles.textLabel}>Altitude:</Text>
+                <NumberInput
+                  value={index >= 0 ? this.props.waypoints[index].alt : ""}
+                  style={styles.input}
+                  onChange={alt => {
+                    this.setState({ alt });
+                  }}
+                />
+              </View>
+              <Button onPress={this.save} title="Save" />
+            </KeyboardAvoidingView>
+          </ScrollView>
         </SafeAreaView>
       </Fragment>
     );
@@ -117,8 +129,8 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 22,
     borderWidth: 1,
-    marginBottom: 10,
-    padding: 5
+    marginBottom: 10
+    // padding: 5
   }
 });
 
