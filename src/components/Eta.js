@@ -20,6 +20,10 @@ class Eta extends Component {
     };
   }
 
+  componentDidMount() {
+    this.updateLabels();
+  }
+
   componentDidUpdate() {
     if (this.lastPosition !== this.props.position) {
       this.lastPosition = this.props.position;

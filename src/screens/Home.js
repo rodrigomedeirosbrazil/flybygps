@@ -49,7 +49,7 @@ class Home extends Component {
               </TouchableHighlight>
             </View>
             {this.props.waypoint && (
-              <>
+              <View style={{ justifyContent: "center" }}>
                 <View>
                   <Text style={{ borderWidth: 1 }}>
                     Waypoint: {this.props.waypoint.name}
@@ -59,7 +59,7 @@ class Home extends Component {
                   <Distance />
                   <Eta />
                 </View>
-              </>
+              </View>
             )}
             <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
           </View>
@@ -78,7 +78,8 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   col: {
-    flex: 1
+    flex: 1,
+    justifyContent: "space-between"
   }
 });
 
