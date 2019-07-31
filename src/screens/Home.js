@@ -10,7 +10,6 @@ import {
 
 import { connect } from "react-redux";
 import { toggleGpsAction, newPositionAction } from "../store/actions/gps";
-import { getDistance, getRhumbLineBearing } from "geolib";
 
 import GpsService from "../services/gps";
 import Compass from "../components/Compass";
@@ -32,46 +31,6 @@ class Home extends Component {
     this.props.toggleGps(true);
   }
 
-  getDistanceTo = () => {
-    if (
-      this.props.position &&
-      this.props.position.coords &&
-      this.props.waypoint
-    ) {
-      return getDistance(
-        {
-          latitude: this.props.position.coords.latitude,
-          longitude: this.props.position.coords.longitude
-        },
-        {
-          latitude: this.props.waypoint.lat,
-          longitude: this.props.waypoint.lon
-        }
-      );
-    }
-    return "N/A";
-  };
-
-  getBearingTo = () => {
-    if (
-      this.props.position &&
-      this.props.position.coords &&
-      this.props.waypoint
-    ) {
-      return getRhumbLineBearing(
-        {
-          latitude: this.props.position.coords.latitude,
-          longitude: this.props.position.coords.longitude
-        },
-        {
-          latitude: this.props.waypoint.lat,
-          longitude: this.props.waypoint.lon
-        }
-      );
-    }
-    return "N/A";
-  };
-
   render() {
     const { navigate } = this.props.navigation;
     return (
@@ -89,19 +48,20 @@ class Home extends Component {
                 <Compass />
               </TouchableHighlight>
             </View>
-            <View style={styles.row}>
-              <Distance />
-              <Eta />
-            </View>
-            <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
-            <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>
             {this.props.waypoint && (
-              <Text>
-                Distance to {this.props.waypoint.name}: {this.getDistanceTo()}{" "}
-                Bearing:
-                {this.getBearingTo()}
-              </Text>
+              <>
+                <View>
+                  <Text style={{ borderWidth: 1 }}>
+                    Waypoint: {this.props.waypoint.name}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Distance />
+                  <Eta />
+                </View>
+              </>
             )}
+            <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
           </View>
         </SafeAreaView>
       </Fragment>
