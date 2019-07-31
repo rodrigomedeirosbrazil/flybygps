@@ -17,6 +17,7 @@ import Compass from "../components/Compass";
 import Speed from "../components/Speed";
 import Altitude from "../components/Altitude";
 import Distance from "../components/Distance";
+import Eta from "../components/Eta";
 
 class Home extends Component {
   static navigationOptions = {
@@ -88,8 +89,9 @@ class Home extends Component {
                 <Compass />
               </TouchableHighlight>
             </View>
-            <View>
+            <View style={styles.row}>
               <Distance />
+              <Eta />
             </View>
             <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
             <Text>GPS is: {this.props.isOn ? "ON" : "OFF"}</Text>

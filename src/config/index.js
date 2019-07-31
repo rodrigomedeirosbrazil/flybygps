@@ -11,6 +11,18 @@ const config = {
       factor: 0.000621371
     }
   ],
+  timeUnits: [
+    {
+      name: "hours",
+      symbol: "hrs",
+      factor: 0.000277778
+    },
+    {
+      name: "minutes",
+      symbol: "m",
+      factor: 0.0166667
+    }
+  ],
   altitudeUnits: [
     {
       name: "meters",
