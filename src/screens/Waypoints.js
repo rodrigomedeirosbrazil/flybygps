@@ -5,9 +5,9 @@ import {
   View,
   StatusBar,
   Text,
-  FlatList,
-  TouchableHighlight
+  FlatList
 } from "react-native";
+import Touchable from "react-native-platform-touchable";
 
 import { connect } from "react-redux";
 import {
@@ -31,7 +31,7 @@ class Waypoints extends Component {
         <StatusBar barStyle="light-content" />
         <SafeAreaView>
           <View>
-            <TouchableHighlight
+            <Touchable
               onPress={() => {
                 navigate("Waypoint", { index: -1 });
               }}
@@ -39,12 +39,12 @@ class Waypoints extends Component {
               <Text style={[styles.itemName, { backgroundColor: "#0AF" }]}>
                 Add new waypoint
               </Text>
-            </TouchableHighlight>
+            </Touchable>
             <FlatList
               data={this.props.waypoints}
               keyExtractor={(item, index) => index}
               renderItem={({ item, index }) => (
-                <TouchableHighlight
+                <Touchable
                   style={styles.item}
                   onPress={() => {
                     this.props.setWaypoint(item);
@@ -55,7 +55,7 @@ class Waypoints extends Component {
                   }}
                 >
                   <Text style={styles.itemName}>{item.name}</Text>
-                </TouchableHighlight>
+                </Touchable>
               )}
             />
           </View>

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import Touchable from "react-native-platform-touchable";
+
 import Config from "../config";
 import { connect } from "react-redux";
 
@@ -61,7 +63,7 @@ class Speed extends Component {
   render() {
     const {} = this.state;
     return (
-      <TouchableHighlight onPress={this.changeUnit} style={styles.button}>
+      <Touchable onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
           <View
             style={{
@@ -95,7 +97,7 @@ class Speed extends Component {
             <Text style={styles.text}>{this.state.speedUnit}</Text>
           </View>
         </View>
-      </TouchableHighlight>
+      </Touchable>
     );
   }
 }

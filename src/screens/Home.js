@@ -1,12 +1,6 @@
 import React, { Fragment, Component } from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  StatusBar,
-  Text,
-  TouchableHighlight
-} from "react-native";
+import { SafeAreaView, StyleSheet, View, StatusBar, Text } from "react-native";
+import Touchable from "react-native-platform-touchable";
 
 import { connect } from "react-redux";
 import { toggleGpsAction, newPositionAction } from "../store/actions/gps";
@@ -44,9 +38,9 @@ class Home extends Component {
               <Altitude />
             </View>
             <View style={{ alignItems: "center", padding: 10 }}>
-              <TouchableHighlight onLongPress={() => navigate("Waypoints")}>
+              <Touchable onLongPress={() => navigate("Waypoints")}>
                 <Compass />
-              </TouchableHighlight>
+              </Touchable>
             </View>
             {this.props.waypoint && (
               <View style={{ justifyContent: "center" }}>

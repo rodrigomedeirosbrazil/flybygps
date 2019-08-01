@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import Touchable from "react-native-platform-touchable";
+
 import Config from "../config";
 import { connect } from "react-redux";
 import { getDistance } from "geolib";
@@ -74,7 +76,7 @@ class Distance extends Component {
   render() {
     const {} = this.state;
     return (
-      <TouchableHighlight onPress={this.changeUnit} style={styles.button}>
+      <Touchable onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
           <View
             style={{
@@ -109,7 +111,7 @@ class Distance extends Component {
             <Text style={styles.text}>{this.state.distUnit}</Text>
           </View>
         </View>
-      </TouchableHighlight>
+      </Touchable>
     );
   }
 }
