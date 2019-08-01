@@ -3,6 +3,7 @@ import { View, Animated } from "react-native";
 
 import Svg, { Circle, Text as TextSVG, G, Polygon } from "react-native-svg";
 import { connect } from "react-redux";
+import { getRhumbLineBearing } from "geolib";
 
 class Compass extends Component {
   compassAnimation = null;
@@ -13,6 +14,7 @@ class Compass extends Component {
     super(props);
     this.state = {
       heading: 0,
+      bearing: 0,
       compassRotation: 0,
       needleRotation: 0
     };
@@ -25,24 +27,12 @@ class Compass extends Component {
     }
   }
 
-  setCompass = rotation => {
-    const newRotation =
-      rotation < 0 ? Math.trunc(rotation) + 360 : Math.trunc(rotation) % 360;
-    this.setState({
-      compassRotation: newRotation
-    });
-  };
-
   setPosition = position => {
-    if (
-      !position ||
-      !position.coords ||
-      !position.coords.heading ||
-      position.coords.heading == this.heading
-    )
-      return;
+    if (!position || !position.coords || !position.coords.heading) return;
 
-    this.setHeading(position.coords.heading);
+    if (position.coords.heading !== this.heading)
+      this.setHeading(position.coords.heading);
+    if (position.coords) this.setBearing(position.coords);
   };
 
   setHeading = newHeading => {
@@ -64,6 +54,57 @@ class Compass extends Component {
       duration: 500,
       useNativeDriver: true
     }).start();
+  };
+
+  setCompass = rotation => {
+    const newRotation =
+      rotation < 0 ? Math.trunc(rotation) + 360 : Math.trunc(rotation) % 360;
+    this.setState({
+      compassRotation: newRotation
+    });
+  };
+
+  setBearing = coords => {
+    if (this.props.waypoint) {
+      const bearing = getRhumbLineBearing(
+        {
+          latitude: coords.latitude,
+          longitude: coords.longitude
+        },
+        {
+          latitude: this.props.waypoint.lat,
+          longitude: this.props.waypoint.lon
+        }
+      );
+      let newRotation = bearing ? 360 - bearing : 0;
+      newRotation = this.state.compassRotation - newRotation;
+      if (newRotation == this.state.needleRotation) return;
+      this.setState({ bearing });
+
+      const toValue =
+        this.state.needleRotation +
+        this.calcNearTurn(this.state.needleRotation, newRotation);
+
+      if (this.needleAnimation) Animated.timing(this.needleAnimation).stop();
+      (this.needleAnimation = new Animated.Value(this.state.needleRotation)),
+        this.needleAnimation.addListener(param => {
+          this.setNeedle(param.value);
+        });
+
+      Animated.timing(this.needleAnimation, {
+        toValue: toValue,
+        duration: 500,
+        useNativeDriver: true
+      }).start();
+    }
+  };
+
+  setNeedle = rotation => {
+    const newRotation =
+      rotation < 0 ? Math.trunc(rotation) + 360 : Math.trunc(rotation) % 360;
+    this.setState({
+      needleRotation: newRotation
+    });
   };
 
   calcNearTurn = (oldPos, newPos) => {
@@ -131,7 +172,8 @@ class Compass extends Component {
 
 const mapStateToProps = state => {
   return {
-    position: state.gps.position
+    position: state.gps.position,
+    waypoint: state.config.waypoint
   };
 };
 

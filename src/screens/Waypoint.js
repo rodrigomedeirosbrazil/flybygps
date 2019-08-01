@@ -40,6 +40,12 @@ class Waypoint extends Component {
         lon: this.props.waypoints[index].lon,
         alt: this.props.waypoints[index].alt
       });
+    else
+      this.setState({
+        lat: this.props.position.coords.latitude,
+        lon: this.props.position.coords.longitude,
+        alt: this.props.position.coords.altitude
+      });
   };
 
   save = () => {
@@ -89,7 +95,11 @@ class Waypoint extends Component {
                 <Text style={styles.textLabel}>Latitude:</Text>
                 <NumberInput
                   onRef={ref => (this.latRef = ref)}
-                  value={index >= 0 ? this.props.waypoints[index].lat : ""}
+                  value={
+                    index >= 0
+                      ? this.props.waypoints[index].lat
+                      : this.state.lat
+                  }
                   style={styles.input}
                   onChange={lat => {
                     this.setState({ lat });
@@ -100,7 +110,11 @@ class Waypoint extends Component {
                 <Text style={styles.textLabel}>Longitude:</Text>
                 <NumberInput
                   onRef={ref => (this.lonRef = ref)}
-                  value={index >= 0 ? this.props.waypoints[index].lon : ""}
+                  value={
+                    index >= 0
+                      ? this.props.waypoints[index].lon
+                      : this.state.lon
+                  }
                   style={styles.input}
                   onChange={lon => {
                     this.setState({ lon });
@@ -111,7 +125,11 @@ class Waypoint extends Component {
                 <Text style={styles.textLabel}>Altitude:</Text>
                 <NumberInput
                   onRef={ref => (this.altRef = ref)}
-                  value={index >= 0 ? this.props.waypoints[index].alt : ""}
+                  value={
+                    index >= 0
+                      ? this.props.waypoints[index].alt
+                      : this.state.alt
+                  }
                   style={styles.input}
                   onChange={alt => {
                     this.setState({ alt });
@@ -144,6 +162,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
+    position: state.gps.position,
     waypoints: state.config.waypoints
   };
 };

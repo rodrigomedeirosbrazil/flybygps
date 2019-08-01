@@ -61,7 +61,9 @@ class Home extends Component {
                 </View>
               </View>
             )}
-            <Text>{JSON.stringify(this.props.position, null, 4)}</Text>
+            <Text style={{ fontSize: 10 }}>
+              {JSON.stringify(this.props.position, null, 4)}
+            </Text>
           </View>
         </SafeAreaView>
       </Fragment>
