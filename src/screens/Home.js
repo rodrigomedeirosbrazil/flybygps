@@ -1,6 +1,7 @@
 import React, { Fragment, Component } from "react";
 import { SafeAreaView, StyleSheet, View, StatusBar, Text } from "react-native";
 import Touchable from "react-native-platform-touchable";
+import KeepAwake from "react-native-keep-awake";
 
 import { connect } from "react-redux";
 import { toggleGpsAction, newPositionAction } from "../store/actions/gps";
@@ -23,6 +24,12 @@ class Home extends Component {
 
   componentDidMount() {
     this.props.toggleGps(true);
+    KeepAwake.activate();
+  }
+
+  componentWillUnmount() {
+    this.props.toggleGps(false);
+    KeepAwake.deactivate();
   }
 
   render() {
