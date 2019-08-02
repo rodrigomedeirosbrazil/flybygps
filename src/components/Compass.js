@@ -13,8 +13,8 @@ class Compass extends Component {
     super(props);
     this.state = {
       isAnimated: false,
-      heading: 0,
-      bearing: 0,
+      heading: null,
+      bearing: null,
       compassRotation: 0,
       needleRotation: 0
     };
@@ -27,14 +27,23 @@ class Compass extends Component {
   }
 
   setPosition = position => {
-    if (!position || !position.coords || !position.coords.heading) return;
-
-    if (position.coords.heading !== this.heading)
-      this.setHeading(position.coords.heading);
-    if (position.coords) this.setBearing(position.coords);
+    if (
+      !position ||
+      !position.coords ||
+      position.coords.heading === undefined
+    ) {
+      this.setState({ heading: null });
+      this.setCompass(0);
+      if (position.coords) this.setBearing(position.coords);
+    } else {
+      if (position.coords.heading !== this.state.heading)
+        this.setHeading(position.coords.heading);
+      if (position.coords) this.setBearing(position.coords);
+    }
   };
 
   setHeading = newHeading => {
+    this.setState({ heading: newHeading });
     let newRotation = newHeading ? 360 - newHeading : 0;
     if (newRotation == this.state.compassRotation) return;
 
@@ -133,7 +142,12 @@ class Compass extends Component {
     return (
       <View>
         <Svg height="200" width="200" viewBox="0 0 100 100">
-          <G rotation={this.state.compassRotation} origin="50, 50" id="compass">
+          <G
+            rotation={this.state.compassRotation}
+            origin="50, 50"
+            id="compass"
+            opacity={this.state.heading !== null ? "1" : "0.3"}
+          >
             <Circle
               cx="50"
               cy="50"

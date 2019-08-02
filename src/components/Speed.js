@@ -27,12 +27,7 @@ class Speed extends Component {
   }
 
   setPosition = position => {
-    if (
-      !position ||
-      !position.coords ||
-      !position.coords.speed ||
-      position.coords.speed == this.speed
-    ) {
+    if (!position || !position.coords || position.coords.speed === undefined) {
       this.setState({ speed: null });
     } else {
       this.setState({ speed: position.coords.speed });
@@ -43,7 +38,7 @@ class Speed extends Component {
   updateLabels = () => {
     const speedUnit = Config.speedUnits[this.state.speedUnitIndex];
     let speedLabel = "N/A";
-    if (this.state.speed) {
+    if (this.state.speed !== null) {
       const calcSpeed = this.state.speed * speedUnit.factor;
       speedLabel = calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
     }

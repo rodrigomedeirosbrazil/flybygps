@@ -30,8 +30,7 @@ class Altitude extends Component {
     if (
       !position ||
       !position.coords ||
-      !position.coords.altitude ||
-      position.coords.altitude == this.altitude
+      position.coords.altitude === undefined
     ) {
       this.setState({ altitude: null });
     } else {
@@ -43,7 +42,7 @@ class Altitude extends Component {
   updateLabels = () => {
     const altitudeUnit = Config.altitudeUnits[this.state.altitudeUnitIndex];
     let altitudeLabel = "N/A";
-    if (this.state.altitude) {
+    if (this.state.altitude !== null) {
       const calcAltitude = this.state.altitude * altitudeUnit.factor;
       altitudeLabel = calcAltitude.toFixed(calcAltitude < 10 ? 1 : 0);
     }
