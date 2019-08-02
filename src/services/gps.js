@@ -8,12 +8,11 @@ import Geolocation from "@react-native-community/geolocation";
 
 class Gps extends Component {
   watchId = null;
-  updatesEnabled = false;
 
   getLocationOptions = {
     enableHighAccuracy: true,
     timeout: 15000,
-    maximumAge: 60*60*24,
+    maximumAge: 60 * 60 * 24,
     distanceFilter: 1,
     forceRequestLocation: true,
     showLocationDialog: true
@@ -30,17 +29,17 @@ class Gps extends Component {
 
   constructor(props) {
     super(props);
-    this.getLocation();    
+    this.getLocation();
   }
 
-  componentDidUpdate() {
-    if (this.props.isOn && !this.updatesEnabled) {
-      this.updatesEnabled = true;
-      this.getLocation();
-      this.getLocationUpdates();
-    } else if (!this.props.isOn && this.updatesEnabled) {
-      this.updatesEnabled = false;    
-      this.removeLocationUpdates();
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.isOn !== this.props.isOn) {
+      if (this.props.isOn) {
+        this.getLocation();
+        this.getLocationUpdates();
+      } else {
+        this.removeLocationUpdates();
+      }
     }
   }
 
@@ -84,16 +83,16 @@ class Gps extends Component {
 
     if (!hasLocationPermission) return;
 
-     Geolocation.getCurrentPosition(
-       position => {
-         this.props.newPosition(position);
-       },
-       error => {
-         this.setState({ location: error, loading: false });
+    Geolocation.getCurrentPosition(
+      position => {
+        this.props.newPosition(position);
+      },
+      error => {
+        this.setState({ location: error, loading: false });
         //  console.log(error);
-       },
-       this.getLocationOptions
-     );
+      },
+      this.getLocationOptions
+    );
   };
 
   getLocationUpdates = async () => {

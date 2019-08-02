@@ -8,11 +8,11 @@ import { getRhumbLineBearing } from "geolib";
 class Compass extends Component {
   compassAnimation = null;
   needleAnimation = null;
-  lastPosition = null;
 
   constructor(props) {
     super(props);
     this.state = {
+      isAnimated: false,
       heading: 0,
       bearing: 0,
       compassRotation: 0,
@@ -20,9 +20,8 @@ class Compass extends Component {
     };
   }
 
-  componentDidUpdate() {
-    if (this.lastPosition !== this.props.position) {
-      this.lastPosition = this.props.position;
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.position !== this.props.position) {
       this.setPosition(this.props.position);
     }
   }
@@ -43,17 +42,21 @@ class Compass extends Component {
       this.state.compassRotation +
       this.calcNearTurn(this.state.compassRotation, newRotation);
 
-    if (this.compassAnimation) Animated.timing(this.compassAnimation).stop();
-    (this.compassAnimation = new Animated.Value(this.state.compassRotation)),
-      this.compassAnimation.addListener(param => {
-        this.setCompass(param.value);
-      });
+    if (this.state.isAnimated) {
+      if (this.compassAnimation) Animated.timing(this.compassAnimation).stop();
+      (this.compassAnimation = new Animated.Value(this.state.compassRotation)),
+        this.compassAnimation.addListener(param => {
+          this.setCompass(param.value);
+        });
 
-    Animated.timing(this.compassAnimation, {
-      toValue: toValue,
-      duration: 500,
-      useNativeDriver: true
-    }).start();
+      Animated.timing(this.compassAnimation, {
+        toValue: toValue,
+        duration: 500,
+        useNativeDriver: true
+      }).start();
+    } else {
+      this.setCompass(toValue);
+    }
   };
 
   setCompass = rotation => {
@@ -85,17 +88,21 @@ class Compass extends Component {
         this.state.needleRotation +
         this.calcNearTurn(this.state.needleRotation, newRotation);
 
-      if (this.needleAnimation) Animated.timing(this.needleAnimation).stop();
-      (this.needleAnimation = new Animated.Value(this.state.needleRotation)),
-        this.needleAnimation.addListener(param => {
-          this.setNeedle(param.value);
-        });
+      if (this.state.isAnimated) {
+        if (this.needleAnimation) Animated.timing(this.needleAnimation).stop();
+        (this.needleAnimation = new Animated.Value(this.state.needleRotation)),
+          this.needleAnimation.addListener(param => {
+            this.setNeedle(param.value);
+          });
 
-      Animated.timing(this.needleAnimation, {
-        toValue: toValue,
-        duration: 500,
-        useNativeDriver: true
-      }).start();
+        Animated.timing(this.needleAnimation, {
+          toValue: toValue,
+          duration: 500,
+          useNativeDriver: true
+        }).start();
+      } else {
+        this.setNeedle(toValue);
+      }
     }
   };
 

@@ -7,8 +7,6 @@ import { connect } from "react-redux";
 import { getDistance } from "geolib";
 
 class Eta extends Component {
-  lastPosition = null;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -26,9 +24,8 @@ class Eta extends Component {
     this.updateLabels();
   }
 
-  componentDidUpdate() {
-    if (this.lastPosition !== this.props.position) {
-      this.lastPosition = this.props.position;
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.position !== this.props.position) {
       this.setPosition(this.props.position);
     }
   }
