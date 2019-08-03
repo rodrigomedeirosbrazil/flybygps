@@ -31,19 +31,69 @@ class Eta extends Component {
 
   getEtaLabel = () => {
     const { coords } = this.props.position;
-    if (!coords || !coords.latitude || !coords.speed || !this.props.waypoint)
+
+    if (
+      !coords ||
+      !coords.latitude ||
+      !this.props.oldPosition.coords ||
+      !this.props.oldPosition.coords.latitude ||
+      !this.props.waypoint
+    )
       return "N/A";
-    const { latitude, longitude, speed } = coords;
-    const dist = getDistance(
+
+    const oldCoords = this.props.oldPosition.coords;
+
+    const distOld = getDistance(
       {
-        latitude,
-        longitude
+        latitude: oldCoords.latitude,
+        longitude: oldCoords.longitude
       },
       {
         latitude: this.props.waypoint.lat,
         longitude: this.props.waypoint.lon
       }
     );
+
+    const distNew = getDistance(
+      {
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      },
+      {
+        latitude: this.props.waypoint.lat,
+        longitude: this.props.waypoint.lon
+      }
+    );
+
+    if (distNew > distOld) return "N/A";
+
+    const distBetween = getDistance(
+      {
+        latitude: oldCoords.latitude,
+        longitude: oldCoords.longitude
+      },
+      {
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      }
+    );
+    const timeElapsed =
+      this.props.position.timestamp - this.props.oldPosition.timestamp;
+    const speed = (distBetween / timeElapsed) * 1000;
+
+    const dist = getDistance(
+      {
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      },
+      {
+        latitude: this.props.waypoint.lat,
+        longitude: this.props.waypoint.lon
+      }
+    );
+
+    console.tron.log(speed, timeElapsed, distBetween);
+
     const eta = dist / speed;
     const calcEta = eta * this.getUnitFactor();
     return calcEta.toFixed(calcEta < 10 ? 1 : 0);
@@ -117,6 +167,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => {
   return {
     position: state.gps.position,
+    oldPosition: state.gps.oldPosition,
     waypoint: state.config.waypoint
   };
 };
