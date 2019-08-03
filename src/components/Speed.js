@@ -9,51 +9,38 @@ class Speed extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      speed: null,
-      speedUnitIndex: 1,
-      speedLabel: "",
-      speedUnit: ""
+      speedUnitIndex: 1
     };
   }
 
-  componentDidMount() {
-    this.updateLabels();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.position !== this.props.position) {
-      this.setPosition(this.props.position);
-    }
-  }
-
-  setPosition = position => {
-    if (!position || !position.coords || position.coords.speed === undefined) {
-      this.setState({ speed: null });
-    } else {
-      this.setState({ speed: position.coords.speed });
-    }
-    this.updateLabels();
-  };
-
-  updateLabels = () => {
-    const speedUnit = Config.speedUnits[this.state.speedUnitIndex];
-    let speedLabel = "N/A";
-    if (this.state.speed !== null) {
-      const calcSpeed = this.state.speed * speedUnit.factor;
-      speedLabel = calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
-    }
-    this.setState({ speedLabel, speedUnit: speedUnit.symbol });
-  };
-
   changeUnit = () => {
     const units = Config.speedUnits.length - 1;
-    if (this.state.speedUnitIndex < units) this.state.speedUnitIndex++;
-    else this.state.speedUnitIndex = 0;
-    this.updateLabels();
+    const speedUnitIndex =
+      this.state.speedUnitIndex < units ? this.state.speedUnitIndex + 1 : 0;
+    this.setState({ speedUnitIndex });
+  };
+
+  getUnitFactor = () => {
+    const speedUnit = Config.speedUnits[this.state.speedUnitIndex];
+    return speedUnit.factor;
+  };
+
+  getSpeedUnit = () => {
+    const speedUnit = Config.speedUnits[this.state.speedUnitIndex];
+    return speedUnit.symbol;
+  };
+
+  getSpeedLabel = () => {
+    const { coords } = this.props.position;
+    if (!coords || coords.speed === undefined) return "N/A";
+    const { speed } = coords;
+    const calcSpeed = speed * this.getUnitFactor();
+    return calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
   };
 
   render() {
-    const {} = this.state;
+    const speedLabel = this.getSpeedLabel();
+    const speedUnit = this.getSpeedUnit();
     return (
       <Touchable onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
@@ -75,7 +62,7 @@ class Speed extends Component {
               alignItems: "center"
             }}
           >
-            <Text style={styles.number}>{this.state.speedLabel}</Text>
+            <Text style={styles.number}>{speedLabel}</Text>
           </View>
           <View
             style={{
@@ -86,7 +73,7 @@ class Speed extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>{this.state.speedUnit}</Text>
+            <Text style={styles.text}>{speedUnit}</Text>
           </View>
         </View>
       </Touchable>

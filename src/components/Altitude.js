@@ -9,55 +9,40 @@ class Altitude extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      altitude: 0,
-      altitudeUnitIndex: 0,
-      altitudeLabel: "",
-      altitudeUnit: ""
+      altitudeUnitIndex: 0
     };
   }
 
-  componentDidMount() {
-    this.updateLabels();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.position !== this.props.position) {
-      this.setPosition(this.props.position);
-    }
-  }
-
-  setPosition = position => {
-    if (
-      !position ||
-      !position.coords ||
-      position.coords.altitude === undefined
-    ) {
-      this.setState({ altitude: null });
-    } else {
-      this.setState({ altitude: position.coords.altitude });
-    }
-    this.updateLabels();
-  };
-
-  updateLabels = () => {
-    const altitudeUnit = Config.altitudeUnits[this.state.altitudeUnitIndex];
-    let altitudeLabel = "N/A";
-    if (this.state.altitude !== null) {
-      const calcAltitude = this.state.altitude * altitudeUnit.factor;
-      altitudeLabel = calcAltitude.toFixed(calcAltitude < 10 ? 1 : 0);
-    }
-    this.setState({ altitudeLabel, altitudeUnit: altitudeUnit.symbol });
-  };
-
   changeUnit = () => {
     const units = Config.altitudeUnits.length - 1;
-    if (this.state.altitudeUnitIndex < units) this.state.altitudeUnitIndex++;
-    else this.state.altitudeUnitIndex = 0;
-    this.updateLabels();
+    const altitudeUnitIndex =
+      this.state.altitudeUnitIndex < units
+        ? this.state.altitudeUnitIndex + 1
+        : 0;
+    this.setState({ altitudeUnitIndex });
+  };
+
+  getUnitFactor = () => {
+    const altitudeUnit = Config.altitudeUnits[this.state.altitudeUnitIndex];
+    return altitudeUnit.factor;
+  };
+
+  getAltitudeUnit = () => {
+    const altitudeUnit = Config.altitudeUnits[this.state.altitudeUnitIndex];
+    return altitudeUnit.symbol;
+  };
+
+  getAltitudeLabel = () => {
+    const { coords } = this.props.position;
+    if (!coords || coords.altitude === undefined) return "N/A";
+    const { altitude } = coords;
+    const calcAltitude = altitude * this.getUnitFactor();
+    return calcAltitude.toFixed(calcAltitude < 10 ? 1 : 0);
   };
 
   render() {
-    const {} = this.state;
+    const altitudeLabel = this.getAltitudeLabel();
+    const altitudeUnit = this.getAltitudeUnit();
     return (
       <Touchable onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
@@ -69,18 +54,17 @@ class Altitude extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>ALTITUDE</Text>
+            <Text style={styles.text}>SPEED</Text>
           </View>
           <View
             style={{
               flex: 1,
               flexDirection: "row",
               justifyContent: "center",
-              alignItems: "center",
-              padding: 5
+              alignItems: "center"
             }}
           >
-            <Text style={styles.number}>{this.state.altitudeLabel}</Text>
+            <Text style={styles.number}>{altitudeLabel}</Text>
           </View>
           <View
             style={{
@@ -91,7 +75,7 @@ class Altitude extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>{this.state.altitudeUnit}</Text>
+            <Text style={styles.text}>{altitudeUnit}</Text>
           </View>
         </View>
       </Touchable>
