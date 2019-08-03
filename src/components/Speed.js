@@ -52,7 +52,7 @@ class Speed extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>SPEED</Text>
+            <Text style={styles.text}>Speed</Text>
           </View>
           <View
             style={{

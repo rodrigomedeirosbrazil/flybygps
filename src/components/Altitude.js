@@ -54,7 +54,7 @@ class Altitude extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>SPEED</Text>
+            <Text style={styles.text}>Altitude</Text>
           </View>
           <View
             style={{
