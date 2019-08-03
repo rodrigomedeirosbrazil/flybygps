@@ -10,68 +10,48 @@ class Distance extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      lat: 0,
-      lon: 0,
-      dist: null,
-      distUnitIndex: 0,
-      distLabel: "",
-      distUnit: ""
+      distUnitIndex: 0
     };
   }
 
-  componentDidMount() {
-    this.updateLabels();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.position !== this.props.position) {
-      this.setPosition(this.props.position);
-    }
-  }
-
-  setPosition = position => {
-    if (!position || !position.coords || !position.coords.latitude) {
-      this.setState({ lat: null, lon: null });
-    } else {
-      this.setState({
-        lat: position.coords.latitude,
-        lon: position.coords.longitude
-      });
-    }
-    this.updateLabels();
-  };
-
-  updateLabels = () => {
-    const distUnit = Config.distanceUnits[this.state.distUnitIndex];
-    let distLabel = "N/A";
-    if (this.state.lat && this.state.lon && this.props.waypoint) {
-      const dist = getDistance(
-        {
-          latitude: this.state.lat,
-          longitude: this.state.lon
-        },
-        {
-          latitude: this.props.waypoint.lat,
-          longitude: this.props.waypoint.lon
-        }
-      );
-      this.setState({ dist });
-
-      const calcdist = dist * distUnit.factor;
-      distLabel = calcdist.toFixed(calcdist < 10 ? 1 : 0);
-    }
-    this.setState({ distLabel, distUnit: distUnit.symbol });
-  };
-
   changeUnit = () => {
     const units = Config.distanceUnits.length - 1;
-    if (this.state.distUnitIndex < units) this.state.distUnitIndex++;
-    else this.state.distUnitIndex = 0;
-    this.updateLabels();
+    const distUnitIndex =
+      this.state.distUnitIndex < units ? this.state.distUnitIndex + 1 : 0;
+    this.setState({ distUnitIndex });
+  };
+
+  getUnitFactor = () => {
+    const distUnit = Config.distanceUnits[this.state.distUnitIndex];
+    return distUnit.factor;
+  };
+
+  getDistUnit = () => {
+    const distUnit = Config.distanceUnits[this.state.distUnitIndex];
+    return distUnit.symbol;
+  };
+
+  getDistLabel = () => {
+    const { coords } = this.props.position;
+    if (!coords || !coords.latitude || !this.props.waypoint) return "N/A";
+    const { latitude, longitude } = coords;
+    const dist = getDistance(
+      {
+        latitude,
+        longitude
+      },
+      {
+        latitude: this.props.waypoint.lat,
+        longitude: this.props.waypoint.lon
+      }
+    );
+    const calcdist = dist * this.getUnitFactor();
+    return calcdist.toFixed(calcdist < 10 ? 1 : 0);
   };
 
   render() {
-    const {} = this.state;
+    const distLabel = this.getDistLabel();
+    const distUnit = this.getDistUnit();
     return (
       <Touchable onPress={this.changeUnit} style={styles.button}>
         <View style={styles.container}>
@@ -94,7 +74,7 @@ class Distance extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.number}>{this.state.distLabel}</Text>
+            <Text style={styles.number}>{distLabel}</Text>
           </View>
           <View
             style={{
@@ -105,7 +85,7 @@ class Distance extends Component {
               padding: 5
             }}
           >
-            <Text style={styles.text}>{this.state.distUnit}</Text>
+            <Text style={styles.text}>{distUnit}</Text>
           </View>
         </View>
       </Touchable>
