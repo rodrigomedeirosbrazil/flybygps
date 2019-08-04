@@ -48,7 +48,7 @@ class Compass extends Component {
     const { compassRotation, needleRotation } = this.getCompassRotation();
     return (
       <View>
-        <Svg height="200" width="200" viewBox="0 0 100 100">
+        <Svg height="250" width="250" viewBox="0 0 100 100">
           <G
             rotation={compassRotation}
             origin="50, 50"
