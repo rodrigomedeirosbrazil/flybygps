@@ -10,10 +10,7 @@ import {
 import Touchable from "react-native-platform-touchable";
 
 import { connect } from "react-redux";
-import {
-  updateWaypointsAction,
-  setWaypointAction
-} from "../store/actions/config";
+import { setWaypointAction } from "../store/actions/config";
 
 class Waypoints extends Component {
   static navigationOptions = {
@@ -26,6 +23,7 @@ class Waypoints extends Component {
 
   render() {
     const { navigate } = this.props.navigation;
+    const { waypoints } = this.props;
     return (
       <Fragment>
         <StatusBar barStyle="light-content" />
@@ -41,7 +39,7 @@ class Waypoints extends Component {
               </Text>
             </Touchable>
             <FlatList
-              data={this.props.waypoints}
+              data={waypoints}
               keyExtractor={(item, index) => index}
               renderItem={({ item, index }) => (
                 <Touchable
@@ -85,9 +83,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateWaypoints: waypoints => {
-      dispatch(updateWaypointsAction(waypoints));
-    },
     setWaypoint: waypoint => {
       dispatch(setWaypointAction(waypoint));
     }

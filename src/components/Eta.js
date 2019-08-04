@@ -92,8 +92,6 @@ class Eta extends Component {
       }
     );
 
-    console.tron.log(speed, timeElapsed, distBetween);
-
     const eta = dist / speed;
     const calcEta = eta * this.getUnitFactor();
     return calcEta.toFixed(calcEta < 10 ? 1 : 0);
