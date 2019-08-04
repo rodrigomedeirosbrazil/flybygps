@@ -12,6 +12,7 @@ import {
   Platform
 } from "react-native";
 
+import Touchable from "react-native-platform-touchable";
 import { connect } from "react-redux";
 import { updateWaypointsAction } from "../store/actions/config";
 import NumberInput from "../components/NumberInput";
@@ -40,12 +41,12 @@ class Waypoint extends Component {
         lon: this.props.waypoints[index].lon,
         alt: this.props.waypoints[index].alt
       });
-    else
-      this.setState({
-        lat: this.props.position.coords.latitude,
-        lon: this.props.position.coords.longitude,
-        alt: this.props.position.coords.altitude
-      });
+    // else
+    //   this.setState({
+    //     lat: this.props.position.coords.latitude,
+    //     lon: this.props.position.coords.longitude,
+    //     alt: this.props.position.coords.altitude
+    //   });
   };
 
   save = () => {
@@ -59,8 +60,16 @@ class Waypoint extends Component {
     let waypoints = Object.assign(this.props.waypoints);
     if (index >= 0) waypoints[index] = newWaypoint;
     else waypoints.push(newWaypoint);
+    this.props.navigation.goBack();
     this.props.updateWaypoints(waypoints);
-    this.props.navigation.navigate("Waypoints");
+  };
+
+  delete = () => {
+    const index = this.props.navigation.state.params.index;
+    let waypoints = Object.assign(this.props.waypoints);
+    waypoints.splice(index, 1);
+    this.props.navigation.goBack();
+    this.props.updateWaypoints(waypoints);
   };
 
   render() {
@@ -137,6 +146,20 @@ class Waypoint extends Component {
                 />
               </View>
               <Button onPress={this.save} title="Save" />
+              {index >= 0 && (
+                <Touchable
+                  onPress={this.delete}
+                  style={{
+                    backgroundColor: "#f00",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 10,
+                    height: 35
+                  }}
+                >
+                  <Text style={{ fontSize: 14, color: "#fff" }}>DELETE</Text>
+                </Touchable>
+              )}
             </KeyboardAvoidingView>
           </ScrollView>
         </SafeAreaView>
