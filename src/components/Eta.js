@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Touchable from "react-native-platform-touchable";
+import moment from "moment";
 
-import Config from "../config";
 import { connect } from "react-redux";
 import { getDistance } from "geolib";
 
 class Eta extends Component {
+  Units = [{ symbol: "TIME LEFT" }, { symbol: "ETA" }, { symbol: "KM/H" }];
   constructor(props) {
     super(props);
     this.state = {
@@ -15,38 +16,35 @@ class Eta extends Component {
   }
 
   changeUnit = () => {
-    const units = Config.timeUnits.length - 1;
+    const units = this.Units.length - 1;
     const etaUnitIndex =
       this.state.etaUnitIndex < units ? this.state.etaUnitIndex + 1 : 0;
     this.setState({ etaUnitIndex });
   };
 
-  getUnitFactor = () => {
-    return Config.timeUnits[this.state.etaUnitIndex].factor;
+  getEtaUnit = () => {
+    return this.Units[this.state.etaUnitIndex].symbol;
   };
 
-  getEtaUnit = () => {
-    return Config.timeUnits[this.state.etaUnitIndex].symbol;
+  checkPositions = () => {
+    if (this.props.positions.length < 5 || !this.props.waypoint) return false;
+    let position = this.props.positions.slice(-1)[0];
+    if (!position.coords || !position.coords.latitude) return false;
+    position = this.props.positions[0];
+    if (!position.coords || !position.coords.latitude) return false;
+    return true;
   };
 
   getEtaLabel = () => {
-    const { coords } = this.props.position;
+    if (!this.checkPositions()) return "N/A";
 
-    if (
-      !coords ||
-      !coords.latitude ||
-      !this.props.oldPosition.coords ||
-      !this.props.oldPosition.coords.latitude ||
-      !this.props.waypoint
-    )
-      return "N/A";
-
-    const oldCoords = this.props.oldPosition.coords;
+    const position = this.props.positions.slice(-1)[0];
+    const oldPosition = this.props.positions[0];
 
     const distOld = getDistance(
       {
-        latitude: oldCoords.latitude,
-        longitude: oldCoords.longitude
+        latitude: oldPosition.coords.latitude,
+        longitude: oldPosition.coords.longitude
       },
       {
         latitude: this.props.waypoint.lat,
@@ -56,8 +54,8 @@ class Eta extends Component {
 
     const distNew = getDistance(
       {
-        latitude: coords.latitude,
-        longitude: coords.longitude
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
       },
       {
         latitude: this.props.waypoint.lat,
@@ -69,22 +67,22 @@ class Eta extends Component {
 
     const distBetween = getDistance(
       {
-        latitude: oldCoords.latitude,
-        longitude: oldCoords.longitude
+        latitude: oldPosition.coords.latitude,
+        longitude: oldPosition.coords.longitude
       },
       {
-        latitude: coords.latitude,
-        longitude: coords.longitude
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
       }
     );
-    const timeElapsed =
-      this.props.position.timestamp - this.props.oldPosition.timestamp;
-    const speed = (distBetween / timeElapsed) * 1000;
+
+    const timeElapsed = position.timestamp - oldPosition.timestamp;
+    const speed = (distBetween / timeElapsed) * 1000; // in m/s
 
     const dist = getDistance(
       {
-        latitude: coords.latitude,
-        longitude: coords.longitude
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
       },
       {
         latitude: this.props.waypoint.lat,
@@ -92,9 +90,24 @@ class Eta extends Component {
       }
     );
 
-    const eta = dist / speed;
-    const calcEta = eta * this.getUnitFactor();
-    return calcEta.toFixed(calcEta < 10 ? 1 : 0);
+    const secondsLeft = dist / speed;
+    console.tron.log(secondsLeft, dist);
+
+    if (this.state.etaUnitIndex == 0) {
+      // TIME LEFT
+      return moment()
+        .startOf("day")
+        .seconds(secondsLeft)
+        .format("HH:mm");
+    } else if (this.state.etaUnitIndex == 1) {
+      // Estimated Time Arrival
+      return moment()
+        .add(secondsLeft, "seconds")
+        .format("HH:mm");
+    } else {
+      const calcSpeed = speed * 3.6; // m/s to km/h
+      return calcSpeed.toFixed(calcSpeed < 10 ? 1 : 0);
+    }
   };
 
   render() {
@@ -164,8 +177,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    position: state.gps.position,
-    oldPosition: state.gps.oldPosition,
+    positions: state.gps.positions,
     waypoint: state.config.waypoint
   };
 };

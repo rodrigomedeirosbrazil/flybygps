@@ -49,7 +49,7 @@ class Home extends Component {
                 <Compass />
               </Touchable>
             </View>
-            {this.props.waypoint && (
+            {this.props.waypoint ? (
               <View style={{ justifyContent: "center" }}>
                 <View>
                   <Text style={{ borderWidth: 1 }}>
@@ -60,6 +60,12 @@ class Home extends Component {
                   <Distance />
                   <Eta />
                 </View>
+              </View>
+            ) : (
+              <View
+                style={{ height: 100, width: "100%", alignItems: "center" }}
+              >
+                <Text>Long press in compass to add a waypoint</Text>
               </View>
             )}
             {/* <Text style={{ fontSize: 10 }}>

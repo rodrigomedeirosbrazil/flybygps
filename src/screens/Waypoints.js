@@ -56,6 +56,16 @@ class Waypoints extends Component {
                 </Touchable>
               )}
             />
+            <Touchable
+              onPress={() => {
+                this.props.setWaypoint(null);
+                navigate("Home");
+              }}
+            >
+              <Text style={[styles.itemName, { backgroundColor: "#6FF" }]}>
+                Clear waypoint
+              </Text>
+            </Touchable>
           </View>
         </SafeAreaView>
       </Fragment>
